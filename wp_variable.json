@@ -1,0 +1,11 @@
+{
+  "aws_instance_size": "t3.medium",
+  "aws_instance_profile": "PackerWordpressDependency",
+  "aws_region": "us-west-2",
+  "ami_name": "amz2_ami_wordpress",
+  "source_ami_name": "ami-0cca134ec43cf708f",
+  "ssh_username": "ec2-user",
+  "aws_assoc_public_ip": "false",
+  "aws_vpc_id": "",
+  "aws_subnet_id": ""
+}

@@ -1,0 +1,58 @@
+
+{
+  "variables": {
+    "aws_instance_size": "t3.medium",
+    "aws_instance_profile": null,
+    "aws_region": null,
+    "ami_name": null,
+    "source_ami_name": null,
+    "ssh_username": "ec2-user",
+    "aws_assoc_public_ip": null,
+    "vpc_id": "",
+    "subnet_id": "",
+    "date_time": "{{timestamp}}"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `aws_region`}}",
+      "source_ami": "{{user `source_ami_name`}}",
+      "instance_type": "{{user `aws_instance_size`}}",
+      "iam_instance_profile": "{{user `aws_instance_profile`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "ssh_timeout": "20m",
+      "ami_name": "{{user `ami_name`}}-{{user `date_time`}}",
+      "associate_public_ip_address": "{{user `aws_assoc_public_ip`}}",
+      "ssh_pty" : "true",
+      "vpc_id": "{{user `vpc_id`}}",
+      "subnet_id": "{{user `subnet_id`}}",
+      "run_tags": {
+        "Name": "Packer instance for {{user `source_ami_name`}}",
+        "ami_name": "{{user `source_ami_name`}}",
+        "BuiltBy": "Packer"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo yum update -y",
+        "sudo yum install -y git telnet wget curl",
+        "sudo yum install httpd -y",
+        "sudo yum install php -y",
+        "sudo systemctl restart httpd.service",
+        "sudo systemctl enable httpd.service",
+        "sudo wget https://wordpress.org/wordpress-5.0.18.tar.gz",
+        "sudo tar -xvf wordpress-5.0.18.tar.gz -C /var/www/html/",
+        "sudo mv /var/www/html/wordpress/* /var/www/html/",
+        "sudo yum install php-mysql -y",
+        "sudo systemctl restart httpd.service",
+        "sudo chown -R apache:apache /var/www/html/",
+        "sudo systemctl restart httpd.service"
+      ],
+      "max_retries": 5,
+      "remote_path": "/home/ec2-user/packer_install_wp.sh"
+    }
+  ]
+}
